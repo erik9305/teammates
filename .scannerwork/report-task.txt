@@ -1,6 +1,6 @@
-projectKey=TeamMates
+projectKey=TeamMates_manually
 serverUrl=http://localhost:9000
 serverVersion=8.5.1.38104
-dashboardUrl=http://localhost:9000/dashboard?id=TeamMates
-ceTaskId=AXZlnMZIZwwUq-XWBq8H
-ceTaskUrl=http://localhost:9000/api/ce/task?id=AXZlnMZIZwwUq-XWBq8H
+dashboardUrl=http://localhost:9000/dashboard?id=TeamMates_manually
+ceTaskId=AXZlv6jsZwwUq-XWBq8T
+ceTaskUrl=http://localhost:9000/api/ce/task?id=AXZlv6jsZwwUq-XWBq8T

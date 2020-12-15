@@ -5,8 +5,6 @@ import java.util.List;
 
 import javax.mail.MessagingException;
 
-import org.apache.http.HttpStatus;
-
 import teammates.common.exception.TeammatesException;
 import teammates.common.util.Config;
 import teammates.common.util.Const;
@@ -24,9 +22,9 @@ import teammates.logic.core.SendgridService;
  */
 public class EmailSender {
 
-    private static final Logger log = Logger.getLogger();
+    public static final Logger log = Logger.getLogger();
 
-    private final EmailSenderService service;
+    public final EmailSenderService service;
 
     public EmailSender() {
         if (Config.isUsingSendgrid()) {
@@ -41,33 +39,16 @@ public class EmailSender {
     }
 
     /**
-     * Sends the given {@code message} and generates a log report.
-     *
-     * @return The HTTP status of the email request.
-     */
-    public EmailSendingStatus sendEmail(EmailWrapper message) {
-        if (isTestingAccount(message.getRecipient())) {
-            return new EmailSendingStatus(HttpStatus.SC_OK, "Not sending email to test account");
-        }
+	 * Sends the given {@code message} and generates a log report.
+	 *
+	 * @return The HTTP status of the email request.
+	 * @deprecated Use {@link teammates.common.util.EmailWrapper#sendEmail(teammates.logic.api.EmailSender)} instead
+	 */
+	public EmailSendingStatus sendEmail(EmailWrapper message) {
+		return message.sendEmail(this);
+	}
 
-        EmailSendingStatus status;
-        try {
-            status = service.sendEmail(message);
-        } catch (Exception e) {
-            status = new EmailSendingStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR, e.getMessage());
-        }
-        if (!status.isSuccess()) {
-            log.severe("Email failed to send: " + status.getMessage());
-        }
-
-        String emailLogInfo = String.join("|||", "TEAMMATESEMAILLOG",
-                message.getRecipient(), message.getSubject(), message.getContent(),
-                status.getMessage() == null ? "" : status.getMessage());
-        log.info(emailLogInfo);
-        return status;
-    }
-
-    private boolean isTestingAccount(String email) {
+    public boolean isTestingAccount(String email) {
         return email.endsWith(Const.TEST_EMAIL_DOMAIN);
     }
 

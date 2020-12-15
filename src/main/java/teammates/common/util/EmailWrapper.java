@@ -1,5 +1,9 @@
 package teammates.common.util;
 
+import org.apache.http.HttpStatus;
+
+import teammates.logic.api.EmailSender;
+
 /**
  * Represents an email message and its important metadata.
  */
@@ -74,5 +78,33 @@ public class EmailWrapper {
                + "|from=" + getSenderEmail()
                + "|subject=" + getSubject();
     }
+
+	/**
+	 * Sends the given {@code message} and generates a log report.
+	 *
+	 * @param emailSender TODO
+	 * @return The HTTP status of the email request.
+	 */
+	public EmailSendingStatus sendEmail(EmailSender emailSender) {
+	    if (emailSender.isTestingAccount(getRecipient())) {
+	        return new EmailSendingStatus(HttpStatus.SC_OK, "Not sending email to test account");
+	    }
+	
+	    EmailSendingStatus status;
+	    try {
+	        status = emailSender.service.sendEmail(this);
+	    } catch (Exception e) {
+	        status = new EmailSendingStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+	    }
+	    if (!status.isSuccess()) {
+	        EmailSender.log.severe("Email failed to send: " + status.getMessage());
+	    }
+	
+	    String emailLogInfo = String.join("|||", "TEAMMATESEMAILLOG",
+	            getRecipient(), getSubject(), getContent(),
+	            status.getMessage() == null ? "" : status.getMessage());
+	    EmailSender.log.info(emailLogInfo);
+	    return status;
+	}
 
 }
